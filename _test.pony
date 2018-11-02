@@ -12,7 +12,7 @@ actor Main is TestList
 
 class iso _TestHeap is UnitTest
   fun name(): String =>
-    "Heap"
+    "BinaryHeap"
 
   fun apply(t: TestHelper) ? =>
     _gen_test(t, Time.millis())?
@@ -26,12 +26,12 @@ class iso _TestHeap is UnitTest
       ns.push(rand.int[USize](100))
     end
 
-    _test_push[MinParent[USize]](t, ns)?
-    _test_push[MaxParent[USize]](t, ns)?
-    _test_append[MinParent[USize]](t, ns)?
-    _test_append[MaxParent[USize]](t, ns)?
-    _test_pop[MinParent[USize]](t, ns)?
-    _test_pop[MaxParent[USize]](t, ns)?
+    _test_push[MinHeapPriority[USize]](t, ns)?
+    _test_push[MaxHeapPriority[USize]](t, ns)?
+    _test_append[MinHeapPriority[USize]](t, ns)?
+    _test_append[MaxHeapPriority[USize]](t, ns)?
+    _test_pop[MinHeapPriority[USize]](t, ns)?
+    _test_pop[MaxHeapPriority[USize]](t, ns)?
 
   fun _test_push[P: HeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
     let h = BinaryHeap[USize, P](ns.size())
@@ -58,11 +58,7 @@ class iso _TestHeap is UnitTest
 
     for _ in Range(1, ns.size()) do
       let n = h.pop()?
-      iftype P <: MinParent[USize] then
-        t.assert_true(n >= prev)
-      elseif P <: MaxParent[USize] then
-        t.assert_true(n <= prev)
-      end
+      t.assert_true((prev == n) or P(prev, n))
       prev = n
       _verify[P](t, h)?
     end
@@ -75,18 +71,10 @@ class iso _TestHeap is UnitTest
     let b = a + 1
 
     if a < h.size() then
-      iftype P <: MinParent[USize] then
-        t.assert_false(h._apply(a)? < h._apply(i)?)
-      elseif P <: MaxParent[USize] then
-        t.assert_false(h._apply(a)? > h._apply(i)?)
-      end
+      t.assert_false(P(h._apply(a)?, h._apply(i)?))
       _verify[P](t, h, a)?
     end
     if b < h.size() then
-      iftype P <: MinParent[USize] then
-        t.assert_false(h._apply(a)? < h._apply(i)?)
-      elseif P <: MaxParent[USize] then
-        t.assert_false(h._apply(a)? > h._apply(i)?)
-      end
+      t.assert_false(P(h._apply(b)?, h._apply(i)?))
       _verify[P](t, h, b)?
     end

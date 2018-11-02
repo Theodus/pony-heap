@@ -1,6 +1,6 @@
 
-type MinHeap[A: Comparable[A] #read] is BinaryHeap[A, MinParent[A]]
-type MaxHeap[A: Comparable[A] #read] is BinaryHeap[A, MaxParent[A]]
+type MinHeap[A: Comparable[A] #read] is BinaryHeap[A, MinHeapPriority[A]]
+type MaxHeap[A: Comparable[A] #read] is BinaryHeap[A, MaxHeapPriority[A]]
 
 class BinaryHeap[A: Comparable[A] #read, P: HeapPriority[A]]
   embed _data: Array[A]
@@ -59,55 +59,54 @@ class BinaryHeap[A: Comparable[A] #read, P: HeapPriority[A]]
     end
 
   fun ref _sift_up(n: USize) =>
-    var j = n
+    var idx = n
     try
       while true do
-        let parent_idx = (j - 1) / 2
-        if (parent_idx == j) or not P.ord(_data, j, parent_idx)? then
+        let parent_idx = (idx - 1) / 2
+        if (parent_idx == idx) or not P(_data(idx)?, _data(parent_idx)?) then
           break
         end
-        _data.swap_elements(parent_idx, j)?
-        j = parent_idx
+        _data.swap_elements(parent_idx, idx)?
+        idx = parent_idx
       end
     end
 
   fun ref _sift_down(start: USize, n: USize): Bool =>
-    var i = start
+    var idx = start
     try
       while true do
-        let j1 = (2 * i) + 1
-        if (j1 >= n) or (j1 < 0) then
+        var left = (2 * idx) + 1
+        if (left >= n) or (left < 0) then
           break
         end
-        var j = j1
-        let j2 = j1 + 1
-        if (j2 < n) and P.ord(_data, j2, j1)? then
-          j = j2
+        let right = left + 1
+        if (right < n) and P(_data(right)?, _data(left)?) then
+          left = right
         end
-        if not P.ord(_data, j, i)? then
+        if not P(_data(left)?, _data(idx)?) then
           break
         end
-        _data.swap_elements(i, j)?
-        i = j
+        _data.swap_elements(idx, left)?
+        idx = left
       end
     end
-    i > start
+    idx > start
 
   fun _apply(i: USize): this->A ? =>
     _data(i)?
 
 type HeapPriority[A: Comparable[A] #read] is
-  (_HeapPriority[A]
-  & (MinParent[A] | MaxParent[A]))
+  ( _HeapPriority[A]
+  & (MinHeapPriority[A] | MaxHeapPriority[A]))
 
 interface val _HeapPriority[A: Comparable[A] #read]
   new val create()
-  fun ord(data: Array[A] box, a: USize, b: USize): Bool ?
+  fun apply(x: A, y: A): Bool
 
-primitive MinParent[A: Comparable[A] #read] is _HeapPriority[A]
-  fun ord(data: Array[A] box, a: USize, b: USize): Bool ? =>
-    data(a)? < data(b)?
+primitive MinHeapPriority[A: Comparable[A] #read] is _HeapPriority[A]
+  fun apply(x: A, y: A): Bool =>
+    x < y
 
-primitive MaxParent [A: Comparable[A] #read] is _HeapPriority[A]
-  fun ord(data: Array[A] box, a: USize, b: USize): Bool ? =>
-    data(a)? > data(b)?
+primitive MaxHeapPriority [A: Comparable[A] #read] is _HeapPriority[A]
+  fun apply(x: A, y: A): Bool =>
+    x > y
