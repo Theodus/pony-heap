@@ -2,9 +2,9 @@
 type MinHeap[A: Comparable[A] #read] is BinaryHeap[A, MinHeapPriority[A]]
 type MaxHeap[A: Comparable[A] #read] is BinaryHeap[A, MaxHeapPriority[A]]
 
-class BinaryHeap[A: Comparable[A] #read, P: HeapPriority[A]]
+class BinaryHeap[A: Comparable[A] #read, P: BinaryHeapPriority[A]]
   """
-  A priority queue implemented as a binary heap. The `HeapPriority` type
+  A priority queue implemented as a binary heap. The `BinaryHeapPriority` type
   parameter determines whether this is max-heap or a min-heap.
   """
   embed _data: Array[A]
@@ -128,18 +128,18 @@ class BinaryHeap[A: Comparable[A] #read, P: HeapPriority[A]]
   fun _apply(i: USize): this->A ? =>
     _data(i)?
 
-type HeapPriority[A: Comparable[A] #read] is
-  ( _HeapPriority[A]
+type BinaryHeapPriority[A: Comparable[A] #read] is
+  ( _BinaryHeapPriority[A]
   & (MinHeapPriority[A] | MaxHeapPriority[A]))
 
-interface val _HeapPriority[A: Comparable[A] #read]
+interface val _BinaryHeapPriority[A: Comparable[A] #read]
   new val create()
   fun apply(x: A, y: A): Bool
 
-primitive MinHeapPriority[A: Comparable[A] #read] is _HeapPriority[A]
+primitive MinHeapPriority[A: Comparable[A] #read] is _BinaryHeapPriority[A]
   fun apply(x: A, y: A): Bool =>
     x < y
 
-primitive MaxHeapPriority [A: Comparable[A] #read] is _HeapPriority[A]
+primitive MaxHeapPriority [A: Comparable[A] #read] is _BinaryHeapPriority[A]
   fun apply(x: A, y: A): Bool =>
     x > y

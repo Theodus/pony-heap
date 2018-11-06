@@ -33,7 +33,7 @@ class iso _TestHeap is UnitTest
     _test_pop[MinHeapPriority[USize]](t, ns)?
     _test_pop[MaxHeapPriority[USize]](t, ns)?
 
-  fun _test_push[P: HeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
+  fun _test_push[P: BinaryHeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
     let h = BinaryHeap[USize, P](ns.size())
     for n in ns.values() do
       h.push(n)
@@ -41,13 +41,13 @@ class iso _TestHeap is UnitTest
     end
     t.assert_eq[USize](h.size(), ns.size())
 
-  fun _test_append[P: HeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
+  fun _test_append[P: BinaryHeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
     let h = BinaryHeap[USize, P](ns.size())
     h.append(ns)
     t.assert_eq[USize](h.size(), ns.size())
     _verify[P](t, h)?
 
-  fun _test_pop[P: HeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
+  fun _test_pop[P: BinaryHeapPriority[USize]](t: TestHelper, ns: Array[USize]) ? =>
     let h = BinaryHeap[USize, P](ns.size())
     h.append(ns)
 
@@ -64,7 +64,7 @@ class iso _TestHeap is UnitTest
     end
     t.assert_eq[USize](h.size(), 0)
 
-  fun _verify[P: HeapPriority[USize]]
+  fun _verify[P: BinaryHeapPriority[USize]]
     (t: TestHelper, h: BinaryHeap[USize, P], i: USize = 0) ?
   =>
     let a = (2 * i) + 1
